@@ -17,7 +17,8 @@ public class HeaderConverter {
     public static Map<String, String> eventRequest(HttpHeaders headers, String id) {
         Map<String, String> map = new HashMap<>();
         headers.forEach((k,v)->{
-            if(k.startsWith("fw-") || k.startsWith("x-b3-")){
+            String key = k.toLowerCase();
+            if(key.startsWith("fw-") || key.startsWith("x-b3-")){
                     map.put(k, v.getFirst());
             } else if(headerNamesRequest.contains(k)){
                 map.put(k, v.getFirst());
