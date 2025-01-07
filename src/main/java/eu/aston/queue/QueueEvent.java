@@ -10,6 +10,7 @@ public class QueueEvent {
     private String path;
     private Map<String, String> headers = new HashMap<>();
     private byte[] body;
+    private int timeout;
     private final long created = System.currentTimeMillis();
 
     public String getId() {
@@ -42,6 +43,14 @@ public class QueueEvent {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     public byte[] getBody() {

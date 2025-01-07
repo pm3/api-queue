@@ -46,6 +46,7 @@ public class QueueController {
         event.setPath("/"+path);
         event.setHeaders(HeaderConverter.eventRequest(request.getHeaders(), event.getId()));
         event.setBody(request.getBody().orElse(null));
+        event.setTimeout(request.getHeaders().getFirst("fw-timeout").map(Integer::parseInt).orElse(0));
         LOGGER.info("queue /{} {}", path, event.getId());
         queueStore.addEvent(event);
         return HttpResponse.status(201, "accepted").header("fw-event-id", event.getId());

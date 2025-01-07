@@ -48,13 +48,16 @@ public class QueueStore {
         eventMap.put(event.getId(), event);
         if (workerGroup != null) {
             boolean sent = nextWorker(workerGroup, (w) -> sendRemoteEvent(event, w));
-            if (!sent){
-                LOGGER.debug("waiting in queue {}", event.getId());
-                workerGroup.events.add(event.getId());
-            }
+            if (sent) return;
+            LOGGER.debug("waiting in queue {}", event.getId());
+            workerGroup.events.add(event.getId());
         } else {
             LOGGER.debug("event without worker {} {}", event.getPath(), event.getId());
             superTimer.schedule(120 * 1000L, event.getId(), eventMap::remove);
+        }
+        if(event.getTimeout()>0){
+            String eventId = event.getId();
+            superTimer.schedule(event.getTimeout()*1000L, ()->timeoutEvent(eventId, workerGroup));
         }
     }
 
@@ -120,6 +123,14 @@ public class QueueStore {
             if (!sent) {
                 workerGroup.events.add(event.getId());
             }
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void timeoutEvent(String eventId, WorkerGroup workerGroup) {
+        QueueEvent event = eventMap.remove(eventId);
+        if (event != null) {
+            workerGroup.events.remove(event.getId());
         }
     }
 
